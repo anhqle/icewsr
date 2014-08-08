@@ -1,0 +1,16 @@
+{
+    "contents" : "#' @title Utility functions to query and manipulate data from ICEWS\n#'\n#' @description This package includes various utility functions that I have\n#' created to query and manipulate data from the ICEWS database\n#' \n#' @name icewsr\n#' @docType package\nNULL\n",
+    "created" : 1407526824900.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2220676958",
+    "id" : "A4250868",
+    "lastKnownWriteTime" : 1407533310,
+    "path" : "~/projects/icewsr/R/icewsr-package.r",
+    "project_path" : "R/icewsr-package.r",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

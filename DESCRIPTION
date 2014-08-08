@@ -1,0 +1,15 @@
+Package: icewsr
+Title: Various utility functions to work with ICEWS database
+Version: 0.1
+Author: Anh Le <anh.le@duke.edu>
+Maintainer: Anh Le <anh.le@duke.edu>
+Description: This package includes various utility functions that I have
+    developed to query and manipulate data from the ICEWS database--an event
+    database comprising of all news articles from 2001-present.
+Depends:
+    R (>= 3.1.1)
+Imports:
+    plyr,
+    RMySQL
+License: MIT
+LazyData: true

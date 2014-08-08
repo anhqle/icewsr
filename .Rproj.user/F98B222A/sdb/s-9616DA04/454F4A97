@@ -1,0 +1,17 @@
+{
+    "contents" : "#' @title Get the count of events based on CAMEO codes.\n#' \n#' @description \\code{get_CAMEO_count} returns the count of all the events that have\n#' a specified CAMEO code\n#' \n#' @details This function takes one (or several) CAMEO codes, a date, and two\n#' vectors for source and target countries. It will return the count of events\n#' that have the specified CAMEO code and that happen between the source and\n#' target countries on the given date.\n#' \n#' @param conn A MySQL connection to the ICEWS database. Supply your credentials\n#' to \\code{conn <- dbConnect(MySQL(), user=\"username\", password=\"password\", \n#' dbname=\"event_data\", host=\"our.host.ip\")}\n#' @param cameo.codes A string of the CAMEO codes\n#' @param date A string in the YYYYMMDD format. If \\code{NULL}, will count events on\n#' any date\n#' @param source.country A string specifying the ISOA3Code of the source country.\n#' If \\code{NULL}, will count events from all countries\n#' @param target.country A string specifying the ISOA3Code of the target country.\n#' If \\code{NULL}, will count events targeted at all countries\n#' @examples\n#' \\dontrun{\n#' get_CAMEO_count <- function(conn, cameo.codes=\"('01', '02', '03', '04', '05')\",\n#' date=\"20021025\", source.country=\"AFG\", target.country=\"ALB\")\n#' }\n\nget_CAMEO_count <- function(conn, cameo.codes, date=NULL, source.country=NULL, target.country=NULL) {\n  sql.select <- (\"SELECT e.event_date AS DATE\n                 , cSource.ISOA3Code AS source_country\n                 , cTarget.ISOA3Code AS target_country\n                 , COUNT(*) AS quad_count\")\n  sql.from <- (\"FROM simple_events e\n               JOIN eventtypes t ON e.eventtype_id = t.eventtype_ID\n               JOIN countries cSource ON e.source_country_id = cSource.id\n               JOIN countries cTarget ON e.target_country_id = cTarget.id\")\n  \n  # Write the where clause, which depends on whether country is supplied or not\n  # If not, use all the countries, i.e. only impose the cameo.codes where condition\n  sql.where <- paste(\"WHERE\", paste(\"SUBSTRING(t.code, 1, 2) IN\", cameo.codes))\n  if (!is.null(source.country)) {\n    sql.where <- paste(sql.where, \"AND\", \n                       paste0(\"cSource.ISOA3Code IN ('\", source.country, \"')\"))\n  }\n  if (!is.null(target.country)) {\n    sql.where <- paste(sql.where, \"AND\", \n                       paste0(\"cTarget.ISOA3Code IN ('\", target.country, \"')\"))\n  }\n  # date is YYYYMMDD\n  if (!is.null(date)) {\n    sql.where <- paste(sql.where, \"AND\",\n                       paste0(\"e.event_date IN (STR_TO_DATE('\", date, \"', '%Y%m%d'))\"))\n  }\n  \n  # Write the group by clause, grouping by date, source, and target\n  sql.group <- (\"GROUP BY e.event_date, e.source_country_id, e.target_country_id\n                ORDER BY e.event_date ASC\")\n  \n  # Paste the select, from, where, group clause\n  sql <- paste(sql.select, sql.from, sql.where, sql.group, \";\")\n  \n  # Get and return the result\n  res <- dbGetQuery(conn, sql)\n  return(res)\n}",
+    "created" : 1407526991335.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3442165958",
+    "id" : "454F4A97",
+    "lastKnownWriteTime" : 1407536329,
+    "path" : "~/projects/icewsr/R/get-cameo-count.r",
+    "project_path" : "R/get-cameo-count.r",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

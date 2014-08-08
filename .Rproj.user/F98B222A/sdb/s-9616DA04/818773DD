@@ -1,0 +1,17 @@
+{
+    "contents" : "#' @title Get the count of events based on Quad category\n#' \n#' @description \\code{get_quad_count} takes a vector of quad categories\n#' (including verbal/material cooperation/conflict), determines the corresponding\n#' CAMEO codes, then get the counts for the specified source/target countries\n#' and date by calling \\code{get_CAMEO_count}\n#' \n#' @param conn A MySQL connection to the ICEWS database. Supply your credentials\n#' to \\code{conn <- dbConnect(MySQL(), user=\"username\", password=\"password\", \n#' dbname=\"event_data\", host=\"our.host.ip\")}\n#' @param quad A string indicates a quad category, i.e. one of\n#' \\code{verb.coop, verb.conf, matl.coop, matl.confl)}\n#' @param date A string in the YYYYMMDD format. If \\code{NULL}, will count events on\n#' any date\n#' @param source.country A string specifying the ISOA3Code of the source country.\n#' If \\code{NULL}, will count events from all countries\n#' @param target.country A string specifying the ISOA3Code of the target country.\n#' If \\code{NULL}, will count events targeted at all countries\n#' @examples\n#' \\dontrun{\n#' library(\"plyr\")\n#' quads <- c(\"verb.coop\", \"verb.conf\", \"matl.coop\", \"matl.conf\")\n#' # Get quad counts between all country-dyads in a given date\n#' result1 <- ldply(quads, .fun=getIcewsQuad, date=\"20021025\")\n#' # Get quad counts between one dyad for all dates\n#' result2 <- ldply(quads, .fun=getIcewsQuad, \n#'                 source.country=\"AFG\", target.country=\"ALB\")\n#' # Get quad counts for one dyad in one date\n#' result3 <- ldply(quads, .fun=getIcewsQuad, date=\"20021025\", source.country=\"AFG\", target.country=\"ALB\")\n#' }\n\nget_quad_count <- function(conn, quad, date=NULL, source.country=NULL, target.country=NULL) {\n  if (!exists(\"conn\")) stop(\"No MySQL connection ('conn')\")\n  \n  # Get SQL list of roots codes for quad category\n  quad.root.codes <- list(\n    verb.coop=\"('01', '02', '03', '04', '05')\",\n    matl.coop=\"('06', '07', '08')\",\n    verb.conf=\"('09', '10', '11', '12', '13')\",\n    matl.conf=\"('14', '15', '16', '17', '18', '19', '20')\"\n  )\n  cameo.codes <- quad.root.codes[[quad]]\n  \n  # Get counts from DB\n  counts <- quadEvents(conn, cameo.codes, date, source.country, target.country)\n  \n  if (nrow(counts) > 0) {\n    res <- data.frame(date=counts[ , 1], \n                      source_country=counts[ , 2],\n                      target_country=counts[ , 3],\n                      quad_category=rep(quad, nrow(counts)), \n                      quad_count=counts[ , 4])  \n  } else {\n    res <- data.frame(date=NULL, \n                      source_country=NULL, target_country=NULL, \n                      quad_category=NULL, quad_count=NULL)\n  }\n  \n  return(res)\n}",
+    "created" : 1407530080963.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3685844589",
+    "id" : "818773DD",
+    "lastKnownWriteTime" : 1407536332,
+    "path" : "~/projects/icewsr/R/get-quad-count.r",
+    "project_path" : "R/get-quad-count.r",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
